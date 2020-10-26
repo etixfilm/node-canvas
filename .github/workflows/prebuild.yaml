@@ -193,8 +193,10 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - uses: actions/checkout@v2
-        with:
-          ref: ${{ matrix.canvas_tag }}
+        # TEMPORARILY COMMENTED OUT so that the pushed branch is used instead of
+        # the tagged commit. This branch has the binding.gyp file modified.
+        # with:
+        #   ref: ${{ matrix.canvas_tag }}
 
       - name: Build
         run: |
@@ -202,34 +204,40 @@ jobs:
           npm install --ignore-scripts
           msys2 -c ". prebuild/Windows/preinstall.sh"
           msys2 -c "cp prebuild/Windows/binding.gyp binding.gyp"
-          msys2 -c "node-gyp configure"
           msys2 -c "node-gyp rebuild -j 2"
 
       - name: Bundle
         run: |
           Invoke-WebRequest "http://www.dependencywalker.com/depends22_x64.zip" -OutFile depends22_x64.zip
           7z e depends22_x64.zip
-          ls build/Release/canvas.node
-          ./depends -c -oc:depends.csv build/Release/canvas.node
-          $LastExitCode
-          ls
+          ./depends.exe -c -oc depends.csv build\\Release\\canvas.node -d prebuild\\Windows\\module-search-order.dwp
+          Wait-Process -Name depends
       - name: Bundle pt 2
         shell: msys2 {0}
         run: |
-          ls
           [ -f depends.csv ] || { echo "error invoking depends.exe"; exit 1; }
+
+          echo "depends.csv:"
+          cat depends.csv
+
           copies=$(comm -12 \
             <(cat depends.csv | cut -d ',' -f2 | sed 's/"//g' | tr '[:upper:]' '[:lower:]' | sort) \
             <(find /mingw64/bin -name '*.dll' -printf "%f\n" | tr '[:upper:]' '[:lower:]' | sort) \
           );
 
+          echo "Copies:"
+          echo $copies
+
           for dll in $copies; do
             cp /mingw64/bin/$dll build/Release
           done;
 
-      - name: Test binary
+          echo "$ ls build/release/"
+          ls build/release/
+
+      # - name: Test binary
         # By not running in msys2, this doesn't have access to the msys2 libs
-        run: npm test
+        # run: npm test
 
       - name: Make asset
         id: make_bundle

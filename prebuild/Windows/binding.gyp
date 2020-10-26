@@ -43,6 +43,7 @@
       'include_dirs': [
         '<!(node -e "require(\'nan\')")',
         'D:/a/_temp/msys/msys64/mingw64/include',
+        'D:/a/_temp/msys/msys64/mingw64/include/harfbuzz',
         'D:/a/_temp/msys/msys64/mingw64/include/pango-1.0',
         'D:/a/_temp/msys/msys64/mingw64/include/cairo',
         'D:/a/_temp/msys/msys64/mingw64/include/libpng16',

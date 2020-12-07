@@ -210,11 +210,12 @@ jobs:
         run: |
           Invoke-WebRequest "http://www.dependencywalker.com/depends22_x64.zip" -OutFile depends22_x64.zip
           7z e depends22_x64.zip
-          ./depends.exe -c -oc depends.csv build\\Release\\canvas.node -d prebuild\\Windows\\module-search-order.dwp
-          Wait-Process -Name depends
+      # ./depends.exe -c -oc depends.csv build\\Release\\canvas.node -d prebuild\\Windows\\module-search-order.dwp
+      # Wait-Process -Name depends
       - name: Bundle pt 2
         shell: msys2 {0}
         run: |
+          ./depends.exe -c -oc depends.csv build\\Release\\canvas.node || true
           [ -f depends.csv ] || { echo "error invoking depends.exe"; exit 1; }
 
           echo "depends.csv:"
@@ -235,9 +236,53 @@ jobs:
           echo "$ ls build/release/"
           ls build/release/
 
-      # - name: Test binary
+      # - name: Manual Bundle
+      #   run: |
+      #     # Reported by depends on build server:
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libcairo-2.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libfreetype-6.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libgif-7.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libglib-2.0-0.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libgobject-2.0-0.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libjpeg-8.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libpango-1.0-0.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libpangocairo-1.0-0.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libpng16-16.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\librsvg-2-2.dll build/Release/
+      #     # Reported by depends locally:
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\zlib1.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libfontconfig-1.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libgdk_pixbuf-2.0-0.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libgio-2.0-0.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libintl-8.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libpangoft2-1.0-0.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libpangowin32-1.0-0.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libxml2-2.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libcairo-gobject-2.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libffi-7.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libfribidi-0.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libgcc_s_seh-1.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libharfbuzz-0.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libiconv-2.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\liblzma-5.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libpcre-1.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libpixman-1-0.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libthai-0.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libwinpthread-1.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libdatrie-1.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libbz2-1.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libgraphite2.dll build/Release/
+      #     # In the other binding.gyp:
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libexpat-1.dll build/Release/
+      #     # 'D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libcroco-0.6-3.dll # MISSING
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libgmodule-2.0-0.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libgthread-2.0-0.dll build/Release/
+      #     cp D:\\a\\_temp\\msys\\msys64\\mingw64\\bin\\libgsf-1-114.dll build/Release/
+      #     dir build/Release
+
+      - name: Test binary
         # By not running in msys2, this doesn't have access to the msys2 libs
-        # run: npm test
+        run: npm test
 
       - name: Make asset
         id: make_bundle
